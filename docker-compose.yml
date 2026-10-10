@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: deepcandle_db
+    environment:
+      POSTGRES_USER: deepcandle
+      POSTGRES_PASSWORD: deepcandle_password
+      POSTGRES_DB: deepcandle
+    ports:
+      - "5440:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U deepcandle -d deepcandle"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pgdata:

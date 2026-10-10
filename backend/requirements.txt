@@ -1,0 +1,6 @@
+asyncpg
+websockets
+httpx
+pydantic
+pydantic-settings
+python-dotenv

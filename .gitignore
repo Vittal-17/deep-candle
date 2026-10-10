@@ -1,0 +1,20 @@
+# Byte-compiled / optimized / test cache
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Environments
+.venv/
+venv/
+ENV/
+
+# Data & Large Artifacts
+data/
+*.parquet
+diff_review.diff
+
+# Environment variables
+.env
