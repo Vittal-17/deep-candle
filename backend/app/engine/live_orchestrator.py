@@ -140,6 +140,6 @@ class LiveOrchestrator:
 
             # 3. If 15m candle closed and we got features back, run inference
             if interval == '15m' and features is not None:
-                signal = self.signal_engine.process_features(symbol, features, close, current_time)
+                signal = await self.signal_engine.process_features(symbol, features, close, current_time)
                 if signal:
                     await self.paper_trader.open_position(signal)

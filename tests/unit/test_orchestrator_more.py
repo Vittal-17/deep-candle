@@ -1,7 +1,7 @@
 
 import pytest
 import asyncio
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock, patch, MagicMock
 from app.engine.live_orchestrator import LiveOrchestrator
 
 @pytest.mark.asyncio
@@ -11,7 +11,7 @@ async def test_live_orchestrator_stop_and_exceptions():
 
     # Test stop
     orchestrator.ws = AsyncMock()
-    orchestrator.telemetry_task = AsyncMock()
+    orchestrator.telemetry_task = MagicMock()
     await orchestrator.stop()
     assert not orchestrator.running
     orchestrator.ws.close.assert_called_once()

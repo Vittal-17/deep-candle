@@ -10,7 +10,20 @@ from app.strategy.paper_trader import PaperTrader
 
 @pytest.mark.asyncio
 @patch('app.ml.inference.LGBMInferenceEngine.predict_proba', return_value=0.75)
-async def test_live_signal_loop(mock_predict):
+@patch('app.ml.cro_reasoner.CROReasoner.evaluate')
+async def test_live_signal_loop(mock_evaluate, mock_predict):
+    from app.ml.cro_reasoner import CROVerdict
+    mock_evaluate.return_value = CROVerdict(
+        action="EXECUTE_LONG",
+        rejection_reason=None,
+        entry_price=50000.0,
+        stop_loss=49500.0,
+        take_profit_1=50750.0,
+        take_profit_2=51500.0,
+        risk_reward_ratio=1.5,
+        invalidation_thesis="Test",
+        market_regime="TRENDING"
+    )
     # Connect to db
     conn = await asyncpg.connect(
         user=os.getenv("POSTGRES_USER", "deepcandle"),
@@ -75,7 +88,7 @@ async def test_live_signal_loop(mock_predict):
         await paper_trader.evaluate_tick_or_bar(symbol, bar_15m['high_price'], bar_15m['low_price'], bar_15m['close_price'], current_time=bar_15m['bar_time'], is_15m_close=True)
 
         # Assert inference runs cleanly and outputs bounded probability
-        signal = signal_engine.process_features(symbol, features, bar_15m['close_price'], bar_15m['bar_time'])
+        signal = await signal_engine.process_features(symbol, features, bar_15m['close_price'], bar_15m['bar_time'])
 
         if signal:
             assert 0.0 <= signal['probability'] <= 1.0

@@ -91,7 +91,15 @@ def test_feature_stationarity():
 
     for col in feature_cols:
         series = matrix[col].values
-        res = adfuller(series)
+
+        import warnings
+
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", category=FutureWarning)
+            warnings.filterwarnings("ignore", message=".*SingularMatrixWarning.*")
+            warnings.filterwarnings("ignore", message=".*The design matrix is rank-deficient.*")
+            res = adfuller(series)
+
         p_value = res[1]
         assert p_value < 0.01, f"Feature {col} is non-stationary: ADF p-value={p_value}"
 

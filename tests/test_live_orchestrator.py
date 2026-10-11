@@ -40,7 +40,7 @@ async def test_live_orchestrator():
     # Since it's an ML model, we'll just inject a mock into the signal engine to guarantee a signal for testing.
     original_process_features = orchestrator.signal_engine.process_features
 
-    def mock_process_features(sym, features, close, current_time):
+    async def mock_process_features(sym, features, close, current_time):
         return {
             'symbol': sym,
             'entry_time': current_time,

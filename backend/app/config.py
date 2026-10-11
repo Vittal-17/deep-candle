@@ -8,5 +8,6 @@ class Settings(BaseSettings):
     TIMEFRAMES: List[str] = ["15m", "1h", "5m"]
     BINANCE_WS_URL: str = "wss://stream.binance.com:9443/stream"
     BINANCE_REST_URL: str = "https://api.binance.com/api/v3/klines"
+    PROXY_URL: str = os.getenv("PROXY_URL", "http://127.0.0.1:3009/v1/chat/completions")
 
 settings = Settings()
