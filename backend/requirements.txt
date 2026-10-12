@@ -4,3 +4,8 @@ httpx
 pydantic
 pydantic-settings
 python-dotenv
+numpy
+pandas
+pyarrow
+lightgbm
+psutil

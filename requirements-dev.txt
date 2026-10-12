@@ -1,0 +1,21 @@
+# Core Engine & Asynchronous Services
+asyncpg
+websockets
+httpx
+pydantic
+pydantic-settings
+python-dotenv
+psutil
+
+# Quantitative Features & ML Pipeline
+numpy
+pandas
+pyarrow
+lightgbm
+scikit-learn
+statsmodels
+
+# Testing & Quality Engineering
+pytest
+pytest-asyncio
+pytest-cov
