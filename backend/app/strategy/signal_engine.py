@@ -1,19 +1,21 @@
 import logging
 from typing import Optional
+from app.config import settings
 from app.ml.inference import LGBMInferenceEngine
 from app.ml.cro_reasoner import CROReasoner, CROVerdict
 
 logger = logging.getLogger(__name__)
 
 class SignalEngine:
-    def __init__(self, cro_reasoner: Optional[CROReasoner] = None):
+    def __init__(self, cro_reasoner: Optional[CROReasoner] = None, threshold: Optional[float] = None):
         self.inference_engine = LGBMInferenceEngine()
         self.cro_reasoner = cro_reasoner or CROReasoner()
+        self.threshold = threshold if threshold is not None else settings.SIGNAL_THRESHOLD
 
     async def process_features(self, symbol: str, features: dict, current_close: float, current_time) -> dict | None:
         prob = self.inference_engine.predict_proba(features)
 
-        if prob >= 0.68:
+        if prob >= self.threshold:
             verdict: CROVerdict = await self.cro_reasoner.evaluate(
                 symbol=symbol,
                 features=features,

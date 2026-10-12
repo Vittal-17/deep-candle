@@ -8,6 +8,7 @@ from datetime import datetime, timezone
 from app.pipeline.rolling_buffer import RollingFeatureBuffer
 from app.strategy.signal_engine import SignalEngine
 from app.strategy.paper_trader import PaperTrader
+from app.config import settings
 import websockets
 
 logger = logging.getLogger(__name__)
@@ -140,6 +141,10 @@ class LiveOrchestrator:
 
             # 3. If 15m candle closed and we got features back, run inference
             if interval == '15m' and features is not None:
+                if os.path.exists(settings.EMERGENCY_HALT_FILE):
+                    logger.warning(f"EMERGENCY HALT ACTIVE: {settings.EMERGENCY_HALT_FILE} detected. Skipping inference and trade execution.")
+                    return
+
                 signal = await self.signal_engine.process_features(symbol, features, close, current_time)
                 if signal:
                     await self.paper_trader.open_position(signal)

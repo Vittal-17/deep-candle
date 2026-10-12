@@ -108,3 +108,41 @@ async def test_live_orchestrator_telemetry_loop():
         await orchestrator._telemetry_loop()
 
     assert not orchestrator.running # Should shut down
+
+@pytest.mark.asyncio
+async def test_live_orchestrator_emergency_halt(tmp_path):
+    db_pool = AsyncMock()
+    orchestrator = LiveOrchestrator(db_pool)
+    halt_file = str(tmp_path / "emergency_halt.flag")
+    with open(halt_file, "w") as f:
+        f.write("HALTED")
+
+    # Mock buffer.on_candle_closed to return features
+    orchestrator.buffer.on_candle_closed = MagicMock(return_value={"rsi": 50.0})
+    orchestrator.signal_engine.process_features = AsyncMock()
+    orchestrator.paper_trader.evaluate_tick_or_bar = AsyncMock()
+    orchestrator.paper_trader.open_position = AsyncMock()
+
+    kline = {
+        'e': 'kline',
+        's': 'BTCUSDT',
+        'k': {
+            'i': '15m',
+            'x': True,
+            'h': '105',
+            'l': '95',
+            'c': '100',
+            'o': '100',
+            'v': '1000',
+            'T': 1672531200000,
+            't': 1672531200000
+        }
+    }
+
+    with patch('app.config.settings.EMERGENCY_HALT_FILE', halt_file):
+        await orchestrator._handle_ws_message(kline)
+
+    # Process features / trade execution must have been skipped
+    orchestrator.signal_engine.process_features.assert_not_called()
+    orchestrator.paper_trader.open_position.assert_not_called()
+
